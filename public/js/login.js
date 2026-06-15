@@ -1,30 +1,24 @@
 const loginForm = document.getElementById("loginForm");
 
-loginForm.addEventListener("submit", (e) => {
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const identifier =
-    document.getElementById("identifier").value.trim();
+  const loginData = {
+    identifier: document.getElementById("identifier").value.trim(),
+    password: document.getElementById("password").value.trim(),
+  };
 
-  const password =
-    document.getElementById("password").value.trim();
+  try {
+    const { data } = await axios.post("/api/auth/login", loginData);
 
-  const user =
-    JSON.parse(localStorage.getItem("user"));
+    if (data.success) {
+      localStorage.setItem("token", data.token);
 
-  if (!user) {
-    alert("No user found. Please sign up.");
-    return;
-  }
+      alert(data.message);
 
-  const validUser =
-    (identifier === user.email ||
-      identifier === user.phone) &&
-    password === user.password;
-
-  if (validUser) {
-    alert("Login Successful");
-  } else {
-    alert("Invalid Credentials");
+      window.location.href = "/";
+    }
+  } catch (error) {
+    alert(error.response?.data?.message || "Login Failed");
   }
 });

@@ -1,18 +1,24 @@
 const signupForm = document.getElementById("signupForm");
 
-signupForm.addEventListener("submit", (e) => {
+signupForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const user = {
+  const userData = {
     name: document.getElementById("name").value.trim(),
     email: document.getElementById("email").value.trim(),
     phone: document.getElementById("phone").value.trim(),
     password: document.getElementById("password").value.trim(),
   };
 
-  localStorage.setItem("user", JSON.stringify(user));
+  try {
+    const { data } = await axios.post("/api/auth/signup", userData);
 
-  alert("Signup Successful");
+    alert(data.message);
 
-  window.location.href = "/login";
+    if (data.success) {
+      window.location.href = "/login";
+    }
+  } catch (error) {
+    alert(error.response?.data?.message || "Signup Failed");
+  }
 });
