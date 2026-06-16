@@ -1,5 +1,7 @@
 const sendBtn = document.getElementById("sendBtn");
+
 const messageInput = document.getElementById("messageInput");
+
 const chatBody = document.getElementById("chatBody");
 
 function getTime() {
@@ -9,39 +11,46 @@ function getTime() {
   });
 }
 
-function addMessage(message) {
-  const wrapper = document.createElement("div");
-
-  wrapper.classList.add("message", "sent");
-
-  wrapper.innerHTML = `
-    <div class="bubble">
-      ${message}
-      <span class="time">${getTime()}</span>
-    </div>
-  `;
-
-  chatBody.appendChild(wrapper);
-
-  chatBody.scrollTop = chatBody.scrollHeight;
-}
-
-sendBtn.addEventListener("click", () => {
+async function sendMessage() {
   const text = messageInput.value.trim();
 
   if (!text) return;
 
-  addMessage(text);
+  const userId = localStorage.getItem("userId");
 
-  messageInput.value = "";
-});
+  try {
+    await axios.post("/api/messages/send", {
+      userId,
+      message: text,
+    });
+
+    const div = document.createElement("div");
+
+    div.classList.add("message", "sent");
+
+    div.innerHTML = `
+      <div class="bubble">
+        ${text}
+        <span class="time">
+          ${getTime()}
+        </span>
+      </div>
+    `;
+
+    chatBody.appendChild(div);
+
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    messageInput.value = "";
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+sendBtn.addEventListener("click", sendMessage);
 
 messageInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
-    sendBtn.click();
+    sendMessage();
   }
 });
-
-window.onload = () => {
-  chatBody.scrollTop = chatBody.scrollHeight;
-};

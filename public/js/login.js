@@ -14,9 +14,11 @@ loginForm.addEventListener("submit", async (e) => {
     if (data.success) {
       localStorage.setItem("token", data.token);
 
+      localStorage.setItem("userId", data.userId);
+
       alert(data.message);
 
-      window.location.href = "/";
+      window.location.href = "/chat";
     }
   } catch (error) {
     alert(error.response?.data?.message || "Login Failed");
