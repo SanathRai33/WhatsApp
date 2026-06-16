@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Window</title>
+    <link rel="stylesheet" href="/css/chat.css" />
+  </head>
+  <body>
+    <div class="chat-container">
+      <header class="chat-header">
+        <div class="profile">
+          <img src="https://i.pravatar.cc/150?img=12" alt="avatar" />
+          <div>
+            <h3>John Doe</h3>
+            <span>Online</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="chat-body" id="chatBody">
+        <div class="message received">
+          <div class="bubble">
+            Hey! How are you?
+            <span class="time">10:15 AM</span>
+          </div>
+        </div>
+
+        <div class="message sent">
+          <div class="bubble">
+            I'm doing great 🚀
+            <span class="time">10:16 AM</span>
+          </div>
+        </div>
+      </main>
+
+      <footer class="chat-footer">
+        <input type="text" id="messageInput" placeholder="Type a message..." />
+
+        <button id="sendBtn">Send</button>
+      </footer>
+    </div>
+
+    <script src="/js/chat.js"></script>
+  </body>
+</html>

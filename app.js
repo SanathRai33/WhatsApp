@@ -27,6 +27,10 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "login.html"));
 });
 
+app.get("/chat", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "chat.html"));
+});
+
 sequelize
   .sync()
   .then(() => {
