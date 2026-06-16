@@ -9,11 +9,17 @@ const sendMessage = async (req, res) => {
       message,
     });
 
+    const io = req.app.get("io");
+
+    io.emit("new-message", savedMessage);
+
     res.status(201).json({
       success: true,
       data: savedMessage,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
@@ -24,12 +30,7 @@ const sendMessage = async (req, res) => {
 const getMessages = async (req, res) => {
   try {
     const messages = await Message.findAll({
-      attributes: [
-        "id",
-        "message",
-        "userId",
-        "createdAt",
-      ],
+      attributes: ["id", "message", "userId", "createdAt"],
       order: [["createdAt", "ASC"]],
     });
 
@@ -38,6 +39,7 @@ const getMessages = async (req, res) => {
       messages,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
       message: error.message,

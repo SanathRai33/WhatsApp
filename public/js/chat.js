@@ -1,8 +1,8 @@
 const sendBtn = document.getElementById("sendBtn");
 const messageInput = document.getElementById("messageInput");
 const chatBody = document.getElementById("chatBody");
-const chatBody = document.getElementById("chatBody");
 const currentUserId = Number(localStorage.getItem("userId"));
+const socket = io();
 
 function getTime() {
   return new Date().toLocaleTimeString([], {
@@ -23,23 +23,6 @@ async function sendMessage() {
       userId,
       message: text,
     });
-
-    const div = document.createElement("div");
-
-    div.classList.add("message", "sent");
-
-    div.innerHTML = `
-      <div class="bubble">
-        ${text}
-        <span class="time">
-          ${getTime()}
-        </span>
-      </div>
-    `;
-
-    chatBody.appendChild(div);
-
-    chatBody.scrollTop = chatBody.scrollHeight;
 
     messageInput.value = "";
   } catch (error) {
@@ -99,4 +82,10 @@ messageInput.addEventListener("keypress", (e) => {
 
 window.addEventListener("DOMContentLoaded", () => {
   loadMessages();
+});
+
+socket.on("new-message", (msg) => {
+  renderMessage(msg);
+
+  chatBody.scrollTop = chatBody.scrollHeight;
 });
