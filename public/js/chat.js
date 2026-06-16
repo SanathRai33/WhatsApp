@@ -1,8 +1,8 @@
 const sendBtn = document.getElementById("sendBtn");
-
 const messageInput = document.getElementById("messageInput");
-
 const chatBody = document.getElementById("chatBody");
+const chatBody = document.getElementById("chatBody");
+const currentUserId = Number(localStorage.getItem("userId"));
 
 function getTime() {
   return new Date().toLocaleTimeString([], {
@@ -47,10 +47,56 @@ async function sendMessage() {
   }
 }
 
+function renderMessage(msg) {
+  const div = document.createElement("div");
+
+  div.classList.add("message");
+
+  if (msg.userId === currentUserId) {
+    div.classList.add("sent");
+  } else {
+    div.classList.add("received");
+  }
+
+  const time = new Date(msg.createdAt).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  div.innerHTML = `
+    <div class="bubble">
+      ${msg.message}
+      <span class="time">
+        ${time}
+      </span>
+    </div>
+  `;
+
+  chatBody.appendChild(div);
+}
+
+async function loadMessages() {
+  try {
+    const { data } = await axios.get("/api/messages");
+
+    chatBody.innerHTML = "";
+
+    data.messages.forEach(renderMessage);
+
+    chatBody.scrollTop = chatBody.scrollHeight;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 sendBtn.addEventListener("click", sendMessage);
 
 messageInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
     sendMessage();
   }
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadMessages();
 });
