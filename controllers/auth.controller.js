@@ -68,7 +68,9 @@ const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ id: user.id }, "secretKey", { expiresIn: "1d" });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
     res.status(200).json({
       success: true,

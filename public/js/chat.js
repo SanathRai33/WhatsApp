@@ -2,7 +2,11 @@ const sendBtn = document.getElementById("sendBtn");
 const messageInput = document.getElementById("messageInput");
 const chatBody = document.getElementById("chatBody");
 const currentUserId = Number(localStorage.getItem("userId"));
-const socket = io();
+const token = localStorage.getItem("token");
+
+const socket = io({
+  auth: { token },
+});
 
 function getTime() {
   return new Date().toLocaleTimeString([], {

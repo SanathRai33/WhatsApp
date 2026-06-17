@@ -4,6 +4,7 @@ const path = require("path");
 const http = require("http");
 const { Server } = require("socket.io");
 
+const socketSetup = require("./socket");
 const sequelize = require("./config/db");
 
 const authRoutes = require("./routes/auth.routes");
@@ -44,13 +45,7 @@ const io = new Server(server, {
 
 app.set("io", io);
 
-io.on("connection", (socket) => {
-  console.log("User Connected:", socket.id);
-
-  socket.on("disconnect", () => {
-    console.log("User Disconnected");
-  });
-});
+socketSetup(io);
 
 sequelize
   .sync()
