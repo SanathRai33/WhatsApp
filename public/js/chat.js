@@ -37,14 +37,15 @@ async function sendMessage() {
 function renderMessage(msg) {
   const div = document.createElement("div");
 
+  
   div.classList.add("message");
-
-  if (msg.userId === currentUserId) {
+  
+  if (Number(msg.userId) === currentUserId) {
     div.classList.add("sent");
   } else {
     div.classList.add("received");
   }
-
+  
   const time = new Date(msg.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -52,7 +53,8 @@ function renderMessage(msg) {
 
   div.innerHTML = `
     <div class="bubble">
-      ${msg.message}
+    <small>${msg.username}</small>
+    <p>${msg.message}</p>
       <span class="time">
         ${time}
       </span>

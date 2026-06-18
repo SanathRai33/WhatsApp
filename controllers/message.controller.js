@@ -1,4 +1,4 @@
-const { Message } = require("../models");
+const { Message, User } = require("../models");
 
 const sendMessage = async (req, res) => {
   try {
@@ -11,7 +11,12 @@ const sendMessage = async (req, res) => {
 
     const io = req.app.get("io");
 
-    io.emit("new-message", savedMessage);
+    io.emit("new-message", {
+      id: savedMessage.id,
+      message: savedMessage.message,
+      userId: savedMessage.userId,
+      createdAt: savedMessage.createdAt,
+    });
 
     res.status(201).json({
       success: true,
@@ -30,13 +35,26 @@ const sendMessage = async (req, res) => {
 const getMessages = async (req, res) => {
   try {
     const messages = await Message.findAll({
-      attributes: ["id", "message", "userId", "createdAt"],
+      include: [
+        {
+          model: User,
+          attributes: ["name"],
+        },
+      ],
       order: [["createdAt", "ASC"]],
     });
 
+    const formattedMessages = messages.map((msg) => ({
+      id: msg.id,
+      message: msg.message,
+      userId: msg.userId,
+      username: msg.User.name,
+      createdAt: msg.createdAt,
+    }));
+
     res.status(200).json({
       success: true,
-      messages,
+      messages: formattedMessages,
     });
   } catch (error) {
     console.error(error);
