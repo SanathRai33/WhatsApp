@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="/css/chat.css" />
   </head>
   <body>
+    <div class="room-container">
+      <input type="email" id="receiverEmail" placeholder="Enter user email" />
+      <button id="joinBtn">Join Chat</button>
+    </div>
+
     <div class="chat-container">
       <header class="chat-header">
         <div class="profile">
@@ -38,7 +43,7 @@
         <button id="sendBtn">Send</button>
       </footer>
     </div>
-    
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/js/chat.js"></script>

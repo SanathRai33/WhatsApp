@@ -3,6 +3,10 @@ const messageInput = document.getElementById("messageInput");
 const chatBody = document.getElementById("chatBody");
 const currentUserId = Number(localStorage.getItem("userId"));
 const token = localStorage.getItem("token");
+const joinBtn = document.getElementById("joinBtn");
+const receiverEmail = document.getElementById("receiverEmail");
+
+let currentRoom = "";
 
 const socket = io({
   auth: { token },
@@ -15,37 +19,36 @@ function getTime() {
   });
 }
 
-async function sendMessage() {
+function sendMessage() {
   const text = messageInput.value.trim();
 
   if (!text) return;
 
-  const userId = localStorage.getItem("userId");
+  if (!currentRoom) {
+    alert("Join a room first");
 
-  try {
-    await axios.post("/api/messages/send", {
-      userId,
-      message: text,
-    });
-
-    messageInput.value = "";
-  } catch (error) {
-    console.log(error);
+    return;
   }
+
+  socket.emit("new_message", {
+    roomId: currentRoom,
+    message: text,
+  });
+
+  messageInput.value = "";
 }
 
 function renderMessage(msg) {
   const div = document.createElement("div");
 
-  
   div.classList.add("message");
-  
+
   if (Number(msg.userId) === currentUserId) {
     div.classList.add("sent");
   } else {
     div.classList.add("received");
   }
-  
+
   const time = new Date(msg.createdAt).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -78,6 +81,10 @@ async function loadMessages() {
   }
 }
 
+function createRoomId(email1, email2) {
+  return [email1, email2].sort().join("_");
+}
+
 sendBtn.addEventListener("click", sendMessage);
 
 messageInput.addEventListener("keypress", (e) => {
@@ -94,4 +101,27 @@ socket.on("new-message", (msg) => {
   renderMessage(msg);
 
   chatBody.scrollTop = chatBody.scrollHeight;
+});
+
+socket.on("receive_message", (msg) => {
+  renderMessage({
+    message: msg.message,
+    userId: msg.senderId,
+    username: msg.senderName,
+    createdAt: msg.createdAt,
+  });
+});
+
+joinBtn.addEventListener("click", () => {
+  const myEmail = localStorage.getItem("email");
+
+  const otherEmail = receiverEmail.value.trim();
+
+  if (!otherEmail) return;
+
+  currentRoom = createRoomId(myEmail, otherEmail);
+
+  socket.emit("join_room", currentRoom);
+
+  console.log("Joined Room:", currentRoom);
 });

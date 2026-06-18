@@ -15,6 +15,7 @@ loginForm.addEventListener("submit", async (e) => {
       localStorage.setItem("token", data.token);
 
       localStorage.setItem("userId", data.userId);
+      localStorage.setItem("email", data.email);
 
       alert(data.message);
 

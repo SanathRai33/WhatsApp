@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-// const chatHandler = require("./handlers/chat");
+const chatHandler = require("./handlers/chat");
 const personalChatHandler = require("./handlers/personalChat");
 
 module.exports = (io) => {
