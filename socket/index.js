@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken");
+// const chatHandler = require("./handlers/chat");
+const personalChatHandler = require("./handlers/personalChat");
 
 module.exports = (io) => {
   io.use((socket, next) => {
@@ -11,10 +13,6 @@ module.exports = (io) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      if (!decoded) {
-        return next(new Error("Unable to decode"));
-      }
-
       socket.user = decoded;
 
       next();
@@ -25,6 +23,10 @@ module.exports = (io) => {
 
   io.on("connection", (socket) => {
     console.log("Connected User:", socket.user.id);
+
+    chatHandler(socket, io);
+
+    personalChatHandler(socket, io);
 
     socket.on("disconnect", () => {
       console.log("Disconnected User:", socket.user.id);
