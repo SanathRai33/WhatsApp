@@ -104,6 +104,8 @@ socket.on("new-message", (msg) => {
 });
 
 socket.on("receive_message", (msg) => {
+  console.log("Received Message:", msg);
+
   renderMessage({
     message: msg.message,
     userId: msg.senderId,
@@ -112,16 +114,31 @@ socket.on("receive_message", (msg) => {
   });
 });
 
-joinBtn.addEventListener("click", () => {
-  const myEmail = localStorage.getItem("email");
+joinBtn.addEventListener("click", async () => {
+  const targetEmail = receiverEmail.value.trim();
 
-  const otherEmail = receiverEmail.value.trim();
+  if (!targetEmail) {
+    alert("Enter email");
+    return;
+  }
 
-  if (!otherEmail) return;
+  try {
+    const { data } = await axios.get(
+      `/api/auth/check-user?email=${targetEmail}`,
+    );
 
-  currentRoom = createRoomId(myEmail, otherEmail);
+    if (!data.success) {
+      return;
+    }
 
-  socket.emit("join_room", currentRoom);
+    const myEmail = localStorage.getItem("email");
 
-  console.log("Joined Room:", currentRoom);
+    currentRoom = createRoomId(myEmail, targetEmail);
+
+    socket.emit("join_room", currentRoom);
+
+    alert(`Joined room ${currentRoom}`);
+  } catch (error) {
+    alert("User does not exist");
+  }
 });
