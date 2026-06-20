@@ -37,11 +37,15 @@
         </div>
       </main>
 
-      <footer class="chat-footer">
+      <div class="chat-footer">
+        <label for="mediaInput" class="file-btn"> 📎 </label>
+
+        <input type="file" id="mediaInput" hidden />
+
         <input type="text" id="messageInput" placeholder="Type a message..." />
 
         <button id="sendBtn">Send</button>
-      </footer>
+      </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>

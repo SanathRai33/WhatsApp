@@ -5,6 +5,7 @@ const currentUserId = Number(localStorage.getItem("userId"));
 const token = localStorage.getItem("token");
 const joinBtn = document.getElementById("joinBtn");
 const receiverEmail = document.getElementById("receiverEmail");
+const mediaInput = document.getElementById("mediaInput");
 
 let currentRoom = "";
 
@@ -12,6 +13,7 @@ const socket = io({
   auth: { token },
 });
 
+// Functions
 function getTime() {
   return new Date().toLocaleTimeString([], {
     hour: "2-digit",
@@ -55,18 +57,23 @@ function renderMessage(msg) {
   });
 
   div.innerHTML = `
-    <div class="bubble">
+  <div class="bubble">
     <small>${msg.username}</small>
     <p>${msg.message}</p>
-      <span class="time">
-        ${time}
-      </span>
+    <span class="time">
+    ${time}
+    </span>
     </div>
-  `;
+    `;
 
   chatBody.appendChild(div);
 }
 
+function createRoomId(email1, email2) {
+  return [email1, email2].sort().join("_");
+}
+
+// Async Function
 async function loadMessages() {
   try {
     const { data } = await axios.get("/api/messages");
@@ -81,11 +88,28 @@ async function loadMessages() {
   }
 }
 
-function createRoomId(email1, email2) {
-  return [email1, email2].sort().join("_");
+async function uploadMedia() {
+  const file = mediaInput.files[0];
+
+  if (!file) return;
+
+  const formData = new FormData();
+
+  formData.append("media", file);
+
+  formData.append("userId", localStorage.getItem("userId"));
+
+  try {
+    await axios.post("/api/media/upload", formData);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
+// Event Listeners
 sendBtn.addEventListener("click", sendMessage);
+
+mediaInput.addEventListener("change", uploadMedia);
 
 messageInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
@@ -95,23 +119,6 @@ messageInput.addEventListener("keypress", (e) => {
 
 window.addEventListener("DOMContentLoaded", () => {
   loadMessages();
-});
-
-socket.on("new-message", (msg) => {
-  renderMessage(msg);
-
-  chatBody.scrollTop = chatBody.scrollHeight;
-});
-
-socket.on("receive_message", (msg) => {
-  console.log("Received Message:", msg);
-
-  renderMessage({
-    message: msg.message,
-    userId: msg.senderId,
-    username: msg.senderName,
-    createdAt: msg.createdAt,
-  });
 });
 
 joinBtn.addEventListener("click", async () => {
@@ -141,4 +148,35 @@ joinBtn.addEventListener("click", async () => {
   } catch (error) {
     alert("User does not exist");
   }
+});
+
+// Socket methods
+socket.on("new-message", (msg) => {
+  renderMessage(msg);
+
+  chatBody.scrollTop = chatBody.scrollHeight;
+});
+
+socket.on("receive_message", (msg) => {
+  console.log("Received Message:", msg);
+
+  renderMessage({
+    message: msg.message,
+    userId: msg.senderId,
+    username: msg.senderName,
+    createdAt: msg.createdAt,
+  });
+});
+
+socket.on("new-media", (data) => {
+  const div = document.createElement("div");
+
+  div.innerHTML = `
+      <img
+        src="${data.mediaUrl}"
+        width="200"
+      />
+    `;
+
+  chatBody.appendChild(div);
 });
