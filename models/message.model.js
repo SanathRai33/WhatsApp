@@ -6,6 +6,15 @@ const Message = sequelize.define("Message", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  messageType: {
+    type: DataTypes.ENUM("text", "image", "video", "file"),
+    defaultValue: "text",
+  },
+
+  fileUrl: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 });
 
 module.exports = Message;

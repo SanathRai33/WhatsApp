@@ -1,46 +1,57 @@
-const { uploadFile } =
-  require("../services/s3.service");
+const { Message } = require("../models");
 
-const uploadMedia =
-  async (req, res) => {
+const { uploadToS3 } = require("../services/s3.service");
 
-    try {
+const uploadMedia = async (req, res) => {
+  try {
+    const { userId, groupId } = req.body;
 
-      const file = req.file;
+    const file = req.file;
 
-      const fileUrl =
-        await uploadFile(file);
+    const url = await uploadToS3(file);
 
-      const io =
-        req.app.get("io");
+    let type = "file";
 
-      io.emit("new-media", {
-        senderId:
-          req.body.userId,
-
-        mediaUrl:
-          fileUrl,
-
-        fileType:
-          file.mimetype,
-      });
-
-      res.status(200).json({
-        success: true,
-        url: fileUrl,
-      });
-
-    } catch (error) {
-
-      res.status(500).json({
-        success: false,
-        message:
-          error.message,
-      });
-
+    if (file.mimetype.startsWith("image")) {
+      type = "image";
     }
 
-  };
+    if (file.mimetype.startsWith("video")) {
+      type = "video";
+    }
+
+    const mediaMessage = await Message.create({
+      userId,
+      groupId,
+      messageType: type,
+      fileUrl: url,
+    });
+
+    const io = req.app.get("io");
+
+    io.to(`group_${groupId}`).emit("receive_group_media", {
+      id: mediaMessage.id,
+
+      senderId: userId,
+
+      fileUrl: url,
+
+      messageType: type,
+
+      createdAt: mediaMessage.createdAt,
+    });
+
+    res.status(200).json({
+      success: true,
+      url,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   uploadMedia,

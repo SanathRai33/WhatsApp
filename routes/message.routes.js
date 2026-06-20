@@ -2,13 +2,10 @@ const express = require("express");
 
 const router = express.Router();
 
-const {
-  sendMessage,
-  getMessages,
-} = require("../controllers/message.controller");
+const upload = require("../middleware/upload.middleware");
 
-router.post("/send", sendMessage);
+const { uploadMedia } = require("../controllers/media.controller");
 
-router.get("/", getMessages);
+router.post("/upload", upload.single("media"), uploadMedia);
 
 module.exports = router;

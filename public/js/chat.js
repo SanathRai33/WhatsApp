@@ -73,6 +73,36 @@ function createRoomId(email1, email2) {
   return [email1, email2].sort().join("_");
 }
 
+function renderMedia(media) {
+  const div = document.createElement("div");
+
+  if (media.messageType === "image") {
+    div.innerHTML = `
+      <img
+        src="${media.fileUrl}"
+        width="250"
+      />
+    `;
+  } else if (media.messageType === "video") {
+    div.innerHTML = `
+      <video controls width="250">
+        <source src="${media.fileUrl}">
+      </video>
+    `;
+  } else {
+    div.innerHTML = `
+      <a
+        href="${media.fileUrl}"
+        target="_blank"
+      >
+        Download File
+      </a>
+    `;
+  }
+
+  chatBody.appendChild(div);
+}
+
 // Async Function
 async function loadMessages() {
   try {
@@ -97,13 +127,11 @@ async function uploadMedia() {
 
   formData.append("media", file);
 
-  formData.append("userId", localStorage.getItem("userId"));
+  formData.append("userId", currentUserId);
 
-  try {
-    await axios.post("/api/media/upload", formData);
-  } catch (error) {
-    console.log(error);
-  }
+  formData.append("groupId", currentGroupId);
+
+  await axios.post("/api/media/upload", formData);
 }
 
 // Event Listeners
@@ -179,4 +207,8 @@ socket.on("new-media", (data) => {
     `;
 
   chatBody.appendChild(div);
+});
+
+socket.on("receive_group_media", (data) => {
+  renderMedia(data);
 });
