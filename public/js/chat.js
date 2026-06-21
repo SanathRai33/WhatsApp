@@ -6,8 +6,10 @@ const token = localStorage.getItem("token");
 const joinBtn = document.getElementById("joinBtn");
 const receiverEmail = document.getElementById("receiverEmail");
 const mediaInput = document.getElementById("mediaInput");
+const suggestionBox = document.getElementById("suggestions");
 
 let currentRoom = "";
+let timeout;
 
 const socket = io({
   auth: { token },
@@ -42,6 +44,11 @@ function sendMessage() {
 
 function renderMessage(msg) {
   const div = document.createElement("div");
+  const emptyState = document.querySelector(".empty-state");
+
+  if (emptyState) {
+    emptyState.remove();
+  }
 
   div.classList.add("message");
 
@@ -103,6 +110,44 @@ function renderMedia(media) {
   chatBody.appendChild(div);
 }
 
+function renderSuggestions(suggestions) {
+  suggestionBox.innerHTML = "";
+
+  suggestions.forEach((suggestion) => {
+    const chip = document.createElement("button");
+
+    chip.className = "suggestion-chip";
+
+    chip.textContent = suggestion;
+
+    chip.onclick = () => {
+      messageInput.value = suggestion;
+    };
+
+    suggestionBox.appendChild(chip);
+  });
+}
+
+function renderReplies(replies) {
+  const container = document.getElementById("smartReplies");
+
+  container.innerHTML = "";
+
+  replies.forEach((reply) => {
+    const button = document.createElement("button");
+
+    button.className = "reply-chip";
+
+    button.textContent = reply;
+
+    button.onclick = () => {
+      messageInput.value = reply;
+    };
+
+    container.appendChild(button);
+  });
+}
+
 // Async Function
 async function loadMessages() {
   try {
@@ -132,6 +177,28 @@ async function uploadMedia() {
   formData.append("groupId", currentGroupId);
 
   await axios.post("/api/media/upload", formData);
+}
+
+async function fetchSuggestions() {
+  const text = messageInput.value;
+
+  if (text.length < 3) {
+    return;
+  }
+
+  const { data } = await axios.post("/api/ai/suggest", {
+    text,
+  });
+
+  renderSuggestions(data.suggestions);
+}
+
+async function loadSmartReplies(message) {
+  const { data } = await axios.post("/api/ai/replies", {
+    message,
+  });
+
+  renderReplies(data.replies);
 }
 
 // Event Listeners
@@ -178,6 +245,12 @@ joinBtn.addEventListener("click", async () => {
   }
 });
 
+messageInput.addEventListener("input", () => {
+  clearTimeout(timeout);
+
+  timeout = setTimeout(fetchSuggestions, 600);
+});
+
 // Socket methods
 socket.on("new-message", (msg) => {
   renderMessage(msg);
@@ -211,4 +284,10 @@ socket.on("new-media", (data) => {
 
 socket.on("receive_group_media", (data) => {
   renderMedia(data);
+});
+
+socket.on("receive_message", async (msg) => {
+  renderMessage(msg);
+
+  await loadSmartReplies(msg.message);
 });

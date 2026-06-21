@@ -7,49 +7,55 @@
     <link rel="stylesheet" href="/css/chat.css" />
   </head>
   <body>
-    <div class="room-container">
-      <input type="email" id="receiverEmail" placeholder="Enter user email" />
-      <button id="joinBtn">Join Chat</button>
-    </div>
+    <body>
+      <div class="room-container">
+        <input type="email" id="receiverEmail" placeholder="Enter user email" />
 
-    <div class="chat-container">
-      <header class="chat-header">
-        <div class="profile">
-          <img src="https://i.pravatar.cc/150?img=12" alt="avatar" />
-          <div>
-            <h3>John Doe</h3>
-            <span>Online</span>
-          </div>
-        </div>
-      </header>
-
-      <main class="chat-body" id="chatBody">
-        <div class="message received">
-          <div class="bubble">
-            <span class="time"></span>
-          </div>
-        </div>
-
-        <div class="message sent">
-          <div class="bubble">
-            <span class="time"></span>
-          </div>
-        </div>
-      </main>
-
-      <div class="chat-footer">
-        <label for="mediaInput" class="file-btn"> 📎 </label>
-
-        <input type="file" id="mediaInput" hidden />
-
-        <input type="text" id="messageInput" placeholder="Type a message..." />
-
-        <button id="sendBtn">Send</button>
+        <button id="joinBtn">Join Chat</button>
       </div>
-    </div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="/js/chat.js"></script>
+      <div id="activeChat" class="active-chat">No chat selected</div>
+
+      <div class="chat-container">
+        <header class="chat-header">
+          <div class="profile">
+            <img src="https://i.pravatar.cc/150?img=12" alt="avatar" />
+
+            <div>
+              <h3>Chat App</h3>
+              <span>Online</span>
+            </div>
+          </div>
+        </header>
+
+        <main class="chat-body" id="chatBody">
+          <div class="empty-state">Start the conversation</div>
+        </main>
+
+        <!-- AI Suggestions -->
+        <div id="suggestions" class="suggestions-container"></div>
+
+        <!-- Smart Replies -->
+        <div id="smartReplies" class="smart-replies"></div>
+
+        <div class="chat-footer">
+          <label for="mediaInput" class="file-btn"> 📎 </label>
+
+          <input type="file" id="mediaInput" hidden />
+
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Type a message..."
+          />
+
+          <button id="sendBtn">Send</button>
+        </div>
+      </div>
+
+      <script src="/socket.io/socket.io.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script src="/js/chat.js"></script>
+    </body>
   </body>
 </html>
