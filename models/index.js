@@ -1,5 +1,7 @@
 const User = require("./user.model");
 const Message = require("./message.model");
+const ArchivedMessage = require("./archivedMessage.model");
+
 
 User.hasMany(Message, {
   foreignKey: "userId",
@@ -12,5 +14,5 @@ Message.belongsTo(User, {
 module.exports = {
   User,
   Message,
+  ArchivedMessage,
 };
-

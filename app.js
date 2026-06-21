@@ -49,6 +49,8 @@ app.set("io", io);
 
 socketSetup(io);
 
+require("./jobs/archiveMessages.job");
+
 sequelize
   .sync()
   .then(() => {
